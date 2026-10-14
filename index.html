@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Önemli bir soru 🌹</title>
+<style>
+:root{--bg:#fff1f3;--card:#ffffff;--text:#3b1f2b;--accent:#e11d48;--accent-text:#ffffff;--muted:#e5e7eb;--muted-text:#4b5563;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1016;--card:#2a1822;--text:#fde8ee;--accent:#fb7185;--accent-text:#2a0a14;--muted:#3b2a33;--muted-text:#e5d5db}}
+:root[data-theme="dark"]{--bg:#1c1016;--card:#2a1822;--text:#fde8ee;--accent:#fb7185;--accent-text:#2a0a14;--muted:#3b2a33;--muted-text:#e5d5db}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;align-items:center;justify-content:center;padding:16px;overflow-x:hidden}
+.card{background:var(--card);border-radius:24px;padding:32px 24px;max-width:480px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(225,29,72,.15);min-height:380px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.emoji{font-size:64px;animation:float 2s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+h1{font-size:1.6rem;margin:0}
+.hint{min-height:3em;margin:0;opacity:.85}
+.btns{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;min-height:140px}
+button{border:0;border-radius:999px;cursor:pointer;font-weight:700;font-family:inherit;transition:all .25s ease;white-space:nowrap}
+#yes{background:var(--accent);color:var(--accent-text);font-size:18px;padding:14px 32px}
+#no{background:var(--muted);color:var(--muted-text);font-size:18px;padding:14px 32px}
+#yes:hover{filter:brightness(1.08)}
+.pop{animation:pop .5s ease}
+#no.fleeing{position:fixed;z-index:10;transition:left .18s ease,top .18s ease,all .25s ease}
+@keyframes pop{50%{transform:scale(1.15)}}
+.heart{position:fixed;top:-40px;font-size:28px;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="emoji" id="emoji">🌹</div>
+  <h1 id="title">Hamiyet, benimle bir date'e çıkmak ister misin? Adc'n çok sevinirdi 🎮</h1>
+  <p class="hint" id="hint">Hayır'a tıklamayı deneyebilirsin… 😏</p>
+  <div class="btns" id="btns">
+    <button id="yes">Evet 💖</button>
+    <button id="no">Hayır</button>
+  </div>
+</div>
+<script>
+var yes=document.getElementById('yes'),no=document.getElementById('no');
+var hint=document.getElementById('hint'),title=document.getElementById('title');
+var emoji=document.getElementById('emoji'),btns=document.getElementById('btns');
+var clicks=0;
+var msgs=[
+ "Hayır'a tıklamayı deneyebilirsin ama bence başaramazsın 😏",
+ "Hayır butonu küçülüyor… garip değil mi? 🤔",
+ "Küçücük kaldı, bak 🥺",
+ "Evet kocaman oluyor, bu bir işaret 👀",
+ "Hadi, sadece bir kahve… ya da dondurma? 🍦",
+ "Hayır'a tıklamak için son şansın 😌"
+];
+function hearts(n){
+ for(var i=0;i<n;i++){
+  var h=document.createElement('div');
+  h.className='heart';
+  h.textContent=['💖','💕','🌹','✨'][i%4];
+  h.style.left=Math.random()*100+'vw';
+  h.style.animationDuration=(2+Math.random()*2)+'s';
+  document.body.appendChild(h);
+  setTimeout(function(el){el.remove()},4500,h);
+ }
+}
+no.addEventListener('click',function(){
+ clicks++;
+ var yesSize=18+clicks*7, noSize=Math.max(18-clicks*3,0);
+ yes.style.fontSize=yesSize+'px';
+ yes.style.padding=(14+clicks*3)+'px '+(32+clicks*8)+'px';
+ if(noSize<=4){
+  no.style.display='none';
+  hint.textContent="Artık Hayır butonu yok. Kader konuştu 😌";
+ } else {
+  no.style.fontSize=noSize+'px';
+  no.style.padding=Math.max(14-clicks*2,2)+'px '+Math.max(32-clicks*5,6)+'px';
+  hint.textContent=msgs[Math.min(clicks-1,msgs.length-1)];
+ }
+ emoji.textContent=['🥺','😳','😬','😅','😏'][clicks%5];
+ yes.classList.remove('pop');void yes.offsetWidth;yes.classList.add('pop');
+});
+var dodges=0;
+var dodgeMsgs=[
+ "Hoppala, kaydı 😏",
+ "Utangaç, saklanıyor 😳",
+ "Çok yavaşsın! 😂",
+ "Hayır butonu kaçtı 😆",
+ "Bütün gün deneyebilirsin… 😌",
+ "Senden çok daha hızlı 😂",
+ "Neyse, Evet hemen şurada 👉"
+];
+function dodge(e){
+ if(e&&e.cancelable)e.preventDefault();
+ dodges++;
+ no.classList.add('fleeing');
+ var w=window.innerWidth,h=window.innerHeight;
+ var bw=no.offsetWidth,bh=no.offsetHeight;
+ var r=yes.getBoundingClientRect();
+ var x,y,t=0;
+ do{
+  x=8+Math.random()*Math.max(w-bw-16,1);
+  y=8+Math.random()*Math.max(h-bh-16,1);
+  t++;
+ }while(t<25&&x<r.right+20&&x+bw>r.left-20&&y<r.bottom+20&&y+bh>r.top-20);
+ no.style.left=x+'px';
+ no.style.top=y+'px';
+ var lvl=Math.min(dodges,14);
+ yes.style.fontSize=(18+lvl*2)+'px';
+ yes.style.padding=(14+lvl)+'px '+(32+lvl*3)+'px';
+ if(!(e&&e.auto))hint.textContent=dodgeMsgs[Math.min(dodges-1,dodgeMsgs.length-1)];
+ emoji.textContent=['😏','😳','😂','😌','🥺'][dodges%5];
+}
+no.addEventListener('pointerenter',dodge);
+no.addEventListener('touchstart',dodge,{passive:false});
+no.addEventListener('focus',dodge);
+var timer;
+setTimeout(function(){
+ dodge({auto:true});
+ timer=setInterval(function(){dodge({auto:true})},2000);
+},1000);
+yes.addEventListener('click',function(){
+ emoji.textContent='🎉';
+ title.textContent="Yesss Hamiyet! Adc'n sabırsızlanıyor 🎮";
+ hint.textContent="Ne zaman müsaitsin söyle, gerisini ben hallederim 💬";
+ btns.style.display='none';
+ clearInterval(timer);
+ hearts(40);
+});
+</script>
+</body>
+</html>
